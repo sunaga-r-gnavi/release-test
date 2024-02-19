@@ -1,0 +1,8 @@
+changelog:
+  categories:
+    - title: ServiceA Changes
+      labels:
+        - ServiceA
+    - title: ServiceB Changes
+      labels:
+        - ServiceB
