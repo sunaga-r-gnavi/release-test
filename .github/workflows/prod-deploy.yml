@@ -3,76 +3,39 @@ on:
     inputs:
       serviceA_deploy:
         description: serviceAリリース
-        type: boolean
-        default: false
+        type: choice
         required: true
+        default: 'false'
+        options:
+          - true
+          - false
 
       serviceB_deploy:
         description: serviceBリリース
-        type: boolean
-        default: false
+        type: choice
         required: true
+        default: 'false'
+        options:
+          - true
+          - false
 
       serviceC_deploy:
         description: serviceCリリース
-        type: boolean
-        default: false
+        type: choice
         required: true
+        default: 'false'
+        options:
+          - true
+          - false
 
       release_version:
-        description: リリースタグ(v0.0.0)
+        description: リリースバージョンの明示的な指定(optional)  入力した場合はmajor_releaseオプションは無視される。
         type: string
         required: true
 
 name: Deployment Test
 
 jobs:
-  tag-create:
-    name: create tag
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: リリースタグをgitにpush
-        id: set_git_tag
-        run: |
-          echo "${{ inputs.release_version }}" > TARGET_TAG_NAME
-          cat TARGET_TAG_NAME
-          git tag $(cat TARGET_TAG_NAME)
-          git push origin $(cat TARGET_TAG_NAME)
-          echo ::set-output name=target_tag_name::$(cat TARGET_TAG_NAME)
-
-      - name: get Tag ver
-        id: get_tag_ver
-        run: |
-          echo "$(git tag --sort=creatordate | tail -n 1)" > CUR_TAG
-          echo ::set-output name=cur_tag::$(cat CUR_TAG)
-          echo "最新タグ：$(cat CUR_TAG)"
-          echo "$(git tag --sort=creatordate | tail -n 2 | head -n1)" > PRE_TAG
-          echo ::set-output name=pre_tag::$(cat PRE_TAG)
-          echo "一つ前のタグ：$(cat PRE_TAG)"
-
-      - name: release diff get
-        id: commit_diff
-        run: |
-          echo -e ":clock10: release date: $(TZ=Asia/Tokyo date +%Y-%m-%d-%H%M%S)\n" > DIFF_COMMIT
-          echo "$(git log --merges --first-parent --reverse --pretty=format:"* %b" ${{ steps.get_tag_ver.outputs.pre_tag }}..${{ steps.get_tag_ver.outputs.cur_tag }})" >> DIFF_COMMIT
-          echo "差分：$(cat DIFF_COMMIT)"
-          echo ::set-output name=diffCommit::$(cat DIFF_COMMIT)
-
-      - name: Create release
-        id: create_release
-        uses: actions/create-release@v1.1.4
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ steps.get_tag_ver.outputs.cur_tag }}
-          release_name: Release ${{ steps.get_tag_ver.outputs.cur_tag }}
-          body_path: ./DIFF_COMMIT
-          draft: false
-          prerelease: false
-
   serviceA-deploy:
     if: ${{ inputs.serviceA_deploy == 'true' }}
     uses: ./.github/workflows/deployment.yml
