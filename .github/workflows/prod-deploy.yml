@@ -1,0 +1,21 @@
+on:
+  release:
+    types: [published]
+
+name: Deployment Test
+
+jobs:
+  serviceA-deploy:
+    uses: ./.github/workflows/deployment.yml
+    with:
+      message: serviceA
+
+  serviceB-deploy:
+    uses: ./.github/workflows/deployment.yml
+    with:
+      message: serviceB
+  
+  serviceC-deploy:
+    uses: ./.github/workflows/deployment.yml
+    with:
+      message: serviceC
