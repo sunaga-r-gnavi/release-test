@@ -9,11 +9,13 @@ on:
 jobs:
   Setup:
     runs-on: ubuntu-latest
+    environment: production
     steps:
     - run: echo Setup
 
   Build1:
     runs-on: ubuntu-latest
+    environment: production
     needs: Setup
     steps:
     - run: echo ${{ inputs.message }}
